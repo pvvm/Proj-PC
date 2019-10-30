@@ -5,7 +5,7 @@
 #include <time.h>
 #include <semaphore.h>
 
-int pratos = 0, est_forno = 0, tamanho;
+int pratos = 0, est_forno = 0, tamanho, cont = 0;
 int num_pratos[5] = {0,0,0,0,0};
 int* sorteio = 0;
 struct fila f;
@@ -39,15 +39,15 @@ struct fila consumir(struct fila *f){
 
 void balcao(int id){
     sem_wait(&sem_balcao);
-    printf("Chef %d sovando a massa.\n", id);
-    sleep(1);
+    printf("\t\t\t\t |  Chef %d sovando a massa.           |\n", id);
+    sleep(3);
     sem_post(&sem_balcao);
 }
 
 void fogao(int id){
     sem_wait(&sem_fogao);
-    printf("Chef %d cozinhando a massa.\n", id);
-    sleep(1);
+    printf("\t\t\t\t |  Chef %d cozinhando a massa.        |\n", id);
+    sleep(2);
     sem_post(&sem_fogao);
 }
 
@@ -61,13 +61,18 @@ void forno(int id, int salgadoce){
     sem_wait(&sem_forno);
     proximo = consumir(&f);
     if((proximo.saloudoce == 1 && est_forno == 2) || (proximo.saloudoce == 2 && est_forno == 1)){
-        //pthread_mutex_lock(&dentro_forno);
+        printf("\t\t\t\t |  Chef %d esperando acesso ao forno. |\n", proximo.id_chef);
+        pthread_mutex_lock(&dentro_forno);
+        printf("\t\t\t\t |  Forno liberado para uso.          |\n");
     }
+
     est_forno = proximo.saloudoce;
-    printf("Chef %d assando a massa.\n", proximo.id_chef);
-    sleep(1);
-    //pthread_mutex_unlock(&dentro_forno);
-    sem_post(&sem_fogao);
+
+    printf("\t\t\t\t |  Chef %d assando a massa.           |\n", id);
+    sleep(5);
+    sem_post(&sem_forno);
+
+    pthread_mutex_unlock(&dentro_forno);
 }
 
 void *cozinha(void *args){
@@ -82,19 +87,44 @@ void *cozinha(void *args){
         pthread_mutex_unlock(&mutex);
         switch(sorteio[pratos]){
             case 0:
-                printf("O chef %d preparará uma lasanha.\n", id);
+                printf("O chef %d preparará uma lasanha.  |\t\t\t\t      |\n", id);
                 balcao(id);
                 fogao(id);
-                //forno(id, 1);
-                printf("Pedido de lasanha saindo!\n");
+                forno(id, 1);
+                printf("\t\t\t\t | \t\t\t\t      | Pedido de lasanha do chef %d saindo!\n", id);
                 num_pratos[0]++;
                 break;
+
             case 1:
-                printf("O chef %d preparará um cannoli.\n", id);
+                printf("O chef %d preparará um espaguete. |\t\t\t\t      |\n", id);
+                balcao(id);
                 fogao(id);
-                //forno(id, 2);
-                printf("Pedido de cannoli saindo!\n");
+                printf("\t\t\t\t | \t\t\t\t      | Pedido de espaguete do chef %d saindo!\n", id);
                 num_pratos[1]++;
+                break;
+
+            case 2:
+                printf("O chef %d preparará um risoto.    |\t\t\t\t      |\n", id);
+                fogao(id);
+                printf("\t\t\t\t | \t\t\t\t      | Pedido de risoto do chef %d saindo!\n", id);
+                num_pratos[2]++;
+                break;
+
+            case 3:
+                printf("O chef %d preparará um cannoli.   |\t\t\t\t      |\n", id);
+                balcao(id);
+                fogao(id);
+                printf("\t\t\t\t | \t\t\t\t      | Pedido de cannoli do chef %d saindo!\n", id);
+                num_pratos[3]++;
+                break;
+
+            case 4:
+                printf("O chef %d preparará um zeppole.   |\t\t\t\t      |\n", id);
+                balcao(id);
+                fogao(id);
+                forno(id, 2);
+                printf("\t\t\t\t | \t\t\t\t      | Pedido de zeppole do chef %d saindo!\n", id);
+                num_pratos[4]++;
                 break;
         }
     }
@@ -121,7 +151,7 @@ int main(){
 
     srand(time(0));
     for(int i = 0; i < pratos; i++){
-        sorteio[i] = rand() % 2;
+        sorteio[i] = rand() % 5;
     }
 
     for(int i = 0; i < n; i++){
