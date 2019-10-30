@@ -85,7 +85,7 @@ void *cozinha(void *args){
                 printf("O chef %d preparará uma lasanha.\n", id);
                 balcao(id);
                 fogao(id);
-                forno(id, 1);
+                //forno(id, 1);
                 printf("Pedido de lasanha saindo!\n");
                 num_pratos[0]++;
                 break;
