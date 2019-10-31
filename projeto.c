@@ -160,6 +160,7 @@ int main(){
     tamanho = pratos;                       // Variável para o tamanho máximo da fila
 
     printf("\n____________________________________________________________________________________________________________\n");
+    printf("                                 |                                    |                                     \n");
 
     sorteio = (int*) malloc(pratos * sizeof(int));
 
