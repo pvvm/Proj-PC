@@ -64,16 +64,18 @@ void forno(int id, int salgadoce){              // Função do forno
 
     sem_wait(&sem_forno);
     proximo = consumir(&f);                     // Desempilha
-    if((proximo.saloudoce == 1 && est_forno == 2) || (proximo.saloudoce == 2 && est_forno == 1)){   // Se o próximo for diferente do tipo do atual no forno
+    if(((proximo.saloudoce == 1 && est_forno == 2) || (proximo.saloudoce == 2 && est_forno == 1)) && cont == 1){   // Se o próximo for diferente do tipo do atual no forno
         printf("\t\t\t\t |  Chef %d esperando acesso ao forno. |\n", id);
         pthread_mutex_lock(&dentro_forno);
         printf("\t\t\t\t |  Forno liberado para uso.          |\n");
     }
+    cont = 1;
 
     est_forno = salgadoce;      // Define o tipo do prato atual no forno (salgado ou doce)
 
     printf("\t\t\t\t |  Chef %d assando a massa.           |\n", id);
     sleep(4);
+    cont = 0;
     sem_post(&sem_forno);
 
     pthread_mutex_unlock(&dentro_forno);
