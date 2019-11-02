@@ -1,3 +1,7 @@
+// autor: Pedro Vitor Valença Mizuno
+// arquivo: projeto.c
+// atividade extraclasse
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -46,7 +50,7 @@ void balcao(int id){        // Função do balcão
 
 void fogao(int id){         // Função do fogão
     sem_wait(&sem_fogao);
-    printf("\t\t\t\t |  Chef %d cozinhando a massa.        |\n", id);
+    printf("\t\t\t\t |  Chef %d cozinhando o arroz/massa.  |\n", id);
     sleep(2);
     sem_post(&sem_fogao);
 }
@@ -61,15 +65,15 @@ void forno(int id, int salgadoce){              // Função do forno
     sem_wait(&sem_forno);
     proximo = consumir(&f);                     // Desempilha
     if((proximo.saloudoce == 1 && est_forno == 2) || (proximo.saloudoce == 2 && est_forno == 1)){   // Se o próximo for diferente do tipo do atual no forno
-        printf("\t\t\t\t |  Chef %d esperando acesso ao forno. |\n", proximo.id_chef);
+        printf("\t\t\t\t |  Chef %d esperando acesso ao forno. |\n", id);
         pthread_mutex_lock(&dentro_forno);
         printf("\t\t\t\t |  Forno liberado para uso.          |\n");
     }
 
-    est_forno = proximo.saloudoce;      // Define o tipo do prato atual no forno (salgado ou doce)
+    est_forno = salgadoce;      // Define o tipo do prato atual no forno (salgado ou doce)
 
     printf("\t\t\t\t |  Chef %d assando a massa.           |\n", id);
-    sleep(5);
+    sleep(4);
     sem_post(&sem_forno);
 
     pthread_mutex_unlock(&dentro_forno);
@@ -160,6 +164,7 @@ int main(){
     tamanho = pratos;                       // Variável para o tamanho máximo da fila
 
     printf("\n____________________________________________________________________________________________________________\n");
+    printf("                                 |                                    |                                     \n");
 
     sorteio = (int*) malloc(pratos * sizeof(int));
 
