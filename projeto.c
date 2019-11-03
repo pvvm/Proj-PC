@@ -179,7 +179,6 @@ int main(){
         id = (int *) malloc(sizeof(int));
         *id = i;
         pthread_create(&chef[i], NULL, cozinha, (void *)id);        // Cria as threads chefs
-        free(id);
     }
 
     for(int i = 0; i < n; i++){
